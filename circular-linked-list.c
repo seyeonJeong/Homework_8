@@ -223,6 +223,31 @@ int insertLast(listNode* h, int key) {
  */
 int deleteLast(listNode* h) {
 
+	listNode* storage; // 삭제할 노드를 저장하는 노드를 가리키는 포인터 storage를 생성함
+	listNode* cur = h->rlink; // 탐색에 필요한 노드를 가리키는 포인터 cur을 생성하고 헤더노드가 가리키는 노드를 저장
+
+	while (cur != h) // cur == 헤더노드일때까지
+	{
+		if (h->rlink == h) // 만약 헤더노드가 가리키는 값이 자기자신이면
+		{
+			printf("삭제할 노드가 없습니다.\n");
+			return 0;
+		}
+		if (cur->rlink == h) // cur이 가리키는 값이 NULL이라면
+		{
+			storage = cur; // cur을 storage에 저장한다.
+			cur->llink->rlink = cur->rlink; // 이전 cur의 rlink가 가리키는 노드를 cur의 rlink가 가리키는 노드로 바꾼다.
+			h->llink = cur->llink; // 마지막 노드를 삭제했으므로, cur의 헤더노드의 llink값을 cur의 이전노드로 바꿔준다.(이전노드가 마지막 노드가 됨.)
+			storage->rlink = NULL; // 삭제할 노드의 rlink값을 NULL로 설정
+			storage->llink = NULL; // 삭제할 노드의 llink값을 NULL로 설정
+			free(storage); // storage에 저장된 노드를 해제
+			return 0;
+		}
+		cur = cur->rlink; // cur노드를 cur의 rlink가 가리키는 노드로 변경
+	}
+
+
+
 
 	return 1;
 }
@@ -233,6 +258,21 @@ int deleteLast(listNode* h) {
  */
 int insertFirst(listNode* h, int key) {
 
+	listNode* node = (listNode*)malloc(sizeof(listNode)); // 동적할당을 이용하여 노드생성
+	node->key = key; // 노드의 key값에 매개변수로 받은 key값을 대입
+	if (h->llink == h) // 헤더노드의 다음값이 헤더노드라면(즉, 노드가 없다면)
+	{
+		node->rlink = h->rlink; // node의 rlink가 가리키는 값을 헤더노드의 rlink가 가리키는 값으로 바꿔줌
+		node->llink = h; // node의 llink가 가리키는 값을 헤더노드로 바꿔줌
+		h->llink = node; // 헤더노드의 llink가 가리키는 값을 node로 바꿔줌
+		h->rlink = node; // 헤더노드의 rllink가 가리키는 값을 node로 바꿔줌
+		return 0;
+	}
+	//list의 처음에 노드를 추가해야하므로 추가할 노드의 llink값은 헤더노드 rlink값은 헤더노드의 rlink가 가리키던 노드로 변경하고 원래 첫번째 노드의 llink를 추가할 노드로 바꿔준다.
+	h->rlink->llink = node; // 헤더노드의 rlink가 가리키는 노드의 llink가 가리키는 노드를 node로 바꿔줌
+	node->rlink = h->rlink; // node 노드가 헤더노드가 가리키는 노드를 가리키게함
+	node->llink = h; //node 노드의 llink가 가리키는 값을 헤더노드로 바꿔줌
+	h->rlink = node; // 헤더노드가 node를 가리키게함.
 
 	return 1;
 }
@@ -241,6 +281,26 @@ int insertFirst(listNode* h, int key) {
  * list의 첫번째 노드 삭제
  */
 int deleteFirst(listNode* h) {
+
+	listNode* storage; // 노드를 가리키는 포인터를 정의, 삭제할 노드를 저장하는 용도
+	if (h->rlink == h) // 만약 헤더노드가 가리키는 노드가 NULL일 경우 (노드가 없을 경우)
+	{
+		printf("삭제할 노드가 없습니다.\n");
+		return 0;
+	}
+	else
+	{
+		storage = h->rlink; // 삭제할 노드를 저장 첫번째 노드를 삭제해야하므로 헤더노드가 가리키는 노드를 저장
+		h->rlink = h->rlink->rlink; // 헤더노드가 가리키는 노드를 헤더노드가 가리키는 노드의 rlink로 가리키는 노드로 변경 (두번째 노드를 첫번째 노드의 역할을 하게 만드는 작업)
+		h->rlink->llink = h; // 헤더노드의 rlink가 가리키는 노드의 llink를 헤더노드로 바꿔준다.
+		return 0;
+	}
+	storage->rlink = NULL; // 삭제할 노드의 rlink값을 NULL로 변경
+	storage->llink = NULL; // 삭제할 노드의 llink값을 NULL로 변경
+	free(storage); // 노드를 해제
+
+
+
 
 
 	return 1;
