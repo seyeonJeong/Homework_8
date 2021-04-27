@@ -54,6 +54,7 @@ int main()
 		printf("----------------------------------------------------------------\n");
 
 		printf("Command = ");
+		fflush(stdout);
 		scanf(" %c", &command);
 
 		switch(command) {
@@ -65,16 +66,19 @@ int main()
 			break;
 		case 'i': case 'I':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			insertNode(headnode, key);
 			break;
 		case 'd': case 'D':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			deleteNode(headnode, key);
 			break;
 		case 'n': case 'N':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			insertLast(headnode, key);
 			break;
@@ -83,6 +87,7 @@ int main()
 			break;
 		case 'f': case 'F':
 			printf("Your Key = ");
+			fflush(stdout);
 			scanf("%d", &key);
 			insertFirst(headnode, key);
 			break;
@@ -122,6 +127,20 @@ int initialize(listNode** h) {
 
 /* 메모리 해제 */
 int freeList(listNode* h){
+
+	listNode* p;
+	listNode* prev = NULL;
+	p = h->rlink; // p는 헤더노드의 rlink가 가리키는 노드가 됨
+
+	while (p!= NULL && p != h) // p가 NULL값을 갖거나 p가 h일 때까지
+	{
+		prev = p; // prev는 p가 됨
+		p = p->rlink; // p는 p의 rlink가 가리키는 노드가 됨
+		prev->llink = prev; // prev의 llink는 자기자신이됨
+		prev->rlink = prev; // prev의 rlink는 자기자신이 됨
+		free(prev); // prev를 해제함
+	}
+	free(h); // 헤더노드를 해제
 
 	return 0;
 }
