@@ -41,6 +41,7 @@ int main()
 	char command;
 	int key;
 	listNode* headnode=NULL;
+	printf("[-----[Á¤¼¼¿¬] [2018038027] -----]\n");
 
 	do{
 		printf("----------------------------------------------------------------\n");
