@@ -313,6 +313,24 @@ int deleteFirst(listNode* h) {
  */
 int invertList(listNode* h) {
 
+	listNode* cur = h; // 헤더노드가 가리키는 노드를 가리키는 포인터를 선언함
+	listNode* previous = cur->llink; // 이전 노드를 가리키는 포인터를 선언하고 초기화
+	listNode* trail = previous->llink; // 이전노드의 이전노드를 가리키는 포인터를 선언하고 초기화
+
+	if (h->rlink == h) // h의 rlink가 가리키는 노드가 자기자신일 경우
+	{
+		printf("노드가 없습니다.\n");
+		return 0;
+	}
+	while (cur->rlink != h) // cur의 rlink가 가리키는 노드가 헤더노드 일때까지
+	{
+		trail = previous; //trail의 값은 previous 즉 이전 노드가 됨
+		previous = cur; // 이전 노드의 값은 현재 노드가 됨
+		cur = cur->rlink; // 현재 노드의 값은 현재 노드의 rlink가 가리키는 노드가 됨
+		previous->llink = cur; // 이전 노드의 llink가 가리키는 값은 현재 노드가 됨
+		previous->rlink = trail; // 이전 노드의 rlink가 가리키는 노드는 previous의 이전노드가 됨
+	}
+	cur->rlink = previous; // cur->rlink가 헤더노드이면 cur의 rlink가 가리키는 노드는 previous가 됨
 
 	return 0;
 }
@@ -324,6 +342,54 @@ int invertList(listNode* h) {
  **/
 int insertNode(listNode* h, int key) {
 
+	listNode* cur = h->rlink; //탐색을 위해 cur이라는 노드를 가리키는 포인터를 생성하고 리스트의 first를 가리키게함
+	listNode* n1 = (listNode*)malloc(sizeof(listNode));//동적할당을 이용하여 n1노드를 생성
+	n1->key = key;// n1노드의 key값에 매개변수로 받은 key값을 대입
+
+	if (h->rlink == h)//만약 헤더노드가 가리키는 노드가 자기자신이라면(노드가 없음)
+	{
+		h->rlink = n1;// 헤더노드의 rlink가 n1을 가리키게하고
+		h->llink = n1;//헤더노드의 llink가 n1을 가리키게함
+		n1->rlink = h;// n1의 rlink가  h을 가리키게함 (n1을 첫번째 노드로 설정해줌, 원형 리스트)
+		n1->llink = h; // n1의 llink가 h를 가리키게함
+
+		return 0;
+	}
+	else if (h->rlink->key >= n1->key)//헤더노드가 가리키는 노드의 key 값이 n1의 key값보다 크거나 같은경우
+	{
+		n1->rlink = h->rlink;// n1의 rlink가 가리키는 노드가 헤더노드가 가리키는 노드가됨.
+		h->rlink->llink = n1;
+		n1->llink = h; // n1의 llink가 가리키는 노드가 헤더노드가됨.
+		h->rlink = n1;// 헤더노드가 가리키는 값이 n1노드가 됨.
+		return 0;
+	}
+	while (cur->rlink != h)//cur의 rlink가 가리키는 노드가 헤더노드일때까지 반복
+	{
+		if (cur->key > n1->key)// 만약 cur의 key값이 n1의 key값보다 큰경우
+		{
+			n1->rlink = cur;//n1노드의 rlink가 가리키는 값이 cur이됨.
+			n1->llink = cur->llink; // n1노드의 llink가 가리키는 값이 cur노드의 llink가 가리키는 값이됨. 즉 cur의 이전노드를 n1의 llink가 가리킴
+			cur->llink->rlink = n1; //cur노드의 llink가 가리키는 노드의 rlink 값이 n1노드가 됨
+			cur->llink = n1;//cur노드의 llink가 가리키는 값이 n1이 됨.
+
+			return 0;
+		}
+		if (cur->key == n1->key)// 만약 cur의 key값이 n1의 key 값과 같은경우
+		{
+			n1->rlink = cur;//n1노드의 rlink가 가리키는 노드가 cur이됨.
+			cur->llink->rlink = n1;//cur노드의 llink가 가리키는 노드의 rlink가 가리키는 노드가 n1이 됨.
+			n1->llink = cur->llink; // n1의 llink가 가리키는 노드가 cur의 이전노드가 됨
+			cur->llink = n1;//cur노드의 llink가 가리키는 노드가 n1이 됨.
+
+			return 0;
+		}
+		cur = cur->rlink; // cur노드를 cur의 rlink가 가리키던 노드로 설정 (다음노드로 이동)
+	}
+	//리스트의 끝에 삽입하는 작업(리스트에 n1의 key값보다 큰 key값을 가진 노드가 존재하지 않음)
+	n1->llink = cur; // n1의 llink가 가리키는 노드는 cur이 됨.
+	n1->rlink = h; //n1의 rlink가 가리키는 노드는 헤더노드가 됨.
+	cur->rlink = n1; //cur의 rlink가 가리키는 노드는 n1이 됨.
+	h->llink = n1; //h의 llink가 가리키는 노드는 n1이 됨.
 	return 0;
 }
 
@@ -332,6 +398,51 @@ int insertNode(listNode* h, int key) {
  * list에서 key에 대한 노드 삭제
  */
 int deleteNode(listNode* h, int key) {
+
+	listNode* n1 = (listNode*)malloc(sizeof(listNode));// 동적할당을 이용하여 노드를 가리키는 포인터 n1을 생성
+	listNode* cur = h->rlink;// 탐색에 필요한 노드를 가리키는 포인터 cur을 생성하고 헤더노드가 가리키는 노드를 저장
+	listNode* storage;// 삭제할 노드를 저장하는 노드를 가리키는 포인터 storage를 생성함
+
+	if (h->rlink == h) // h의 rlink가 가리키는 값이 자기자신이면
+	{
+		printf("삭제할 노드가 없습니다.\n");
+		return 0;
+	}
+	while (cur->rlink != h)//cur의 rlink값이 h일때까지 반복
+	{
+		if (h->rlink->key == key)//헤더노드가 가리키는 노드의 key값이 key값일 경우
+		{
+			storage = h->rlink; // 삭제할 노드를 저장 첫번째 노드를 삭제해야하므로 헤더노드가 가리키는 노드를 저장
+			h->rlink = h->rlink->rlink; // 헤더노드가 가리키는 노드를 헤더노드가 가리키는 노드의 rlink로 가리키는 노드로 변경 (두번째 노드를 첫번째 노드의 역할을 하게 만드는 작업)
+			h->rlink->llink = h; // 헤더노드의 rlink가 가리키는 노드의 llink를 헤더노드로 바꿔준다.
+
+			storage->rlink = NULL; // 삭제할 노드의 rlink가 가리키는 값을 NULL로 설정
+			storage->llink = NULL; // 삭제할 노드의 llink가 가리키는 값을 NULL로 설정
+
+			free(storage); // 노드를 해제
+			return 0;
+		}
+		if (cur->key == key) // cur의 key값이 key와 같으면
+		{
+			storage = cur;// storage에 cur노드를 저장
+			cur->llink->rlink = cur->rlink;// 이전cur노드의 rlink가 가리키는 값을 현재 cur노드의 rlink가 가리키는 값으로 변경
+			cur->rlink->llink = cur->llink;
+			storage->rlink = NULL; // 삭제할 노드의 rlink값을 NULL로 설정
+			storage->llink = NULL; // 삭제할 노드의 llink값을 NULL로 설정
+			free(storage); // 노드를 해제
+
+			return 0;
+		}
+
+		cur = cur->rlink; // cur노드를 cur 노드의 rlink가 가리키는 값으로 변경
+	}
+
+	storage = cur; // cur을 storage에 저장한다.
+	cur->llink->rlink = cur->rlink; // 이전 cur의 rlink가 가리키는 노드를 cur의 rlink가 가리키는 노드로 바꾼다.
+	h->llink = cur->llink; // 마지막 노드를 삭제했으므로, cur의 헤더노드의 llink값을 cur의 이전노드로 바꿔준다.(이전노드가 마지막 노드가 됨.)
+	storage->rlink = NULL; // 삭제할 노드의 rlink값을 NULL로 설정
+	storage->llink = NULL; // 삭제할 노드의 llink값을 NULL로 설정
+	free(storage); // storage에 저장된 노드를 해제
 
 	return 0;
 }
