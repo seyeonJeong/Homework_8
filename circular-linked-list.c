@@ -332,6 +332,7 @@ int invertList(listNode* h) {
 		previous->rlink = trail; // 이전 노드의 rlink가 가리키는 노드는 previous의 이전노드가 됨
 	}
 	cur->rlink = previous; // cur->rlink가 헤더노드이면 cur의 rlink가 가리키는 노드는 previous가 됨
+	cur->llink = h; // cur의 llink는 헤더노드가 된다.
 
 	return 0;
 }
